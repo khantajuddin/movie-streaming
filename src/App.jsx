@@ -9,9 +9,91 @@ const options = {
   },
 };
 
+function TVEpisodesData({ messagePromise }) {
+  const data = use(messagePromise);
+  return (
+    <>
+      {data.episodes.map((episode) => (
+        <div key={episode.id}>
+          <h3>Episode {episode.episode_number}</h3>
+          <p>Title: {episode.name}</p>
+          <p>Overview: {episode.overview}</p>
+          <p>Air Date: {episode.air_date}</p>
+          <img
+            src={`https://image.tmdb.org/t/p/w200/${episode.still_path}`}
+            alt={episode.name}
+          />
+          <span style={{ display: "flex", gap: 10, whiteSpace: "nowrap" }}>
+            <a
+              target="_blank"
+              href={`https://vidsrc.cc/v2/embed/tv/${episode.show_id}/${episode.season_number}/${episode.episode_number}`}
+            >
+              Link 1
+            </a>
+            <a
+              target="_blank"
+              href={`https://vidsrc.rip/embed/tv/${episode.show_id}/${episode.season_number}/${episode.episode_number}`}
+            >
+              Link 2{" "}
+            </a>
+            <a
+              target="_blank"
+              href={`https://vidsrc.xyz/embed/tv?tmdb=${episode.show_id}/${episode.season_number}/${episode.episode_number}`}
+            >
+              Link 3{" "}
+            </a>
+            <a
+              target="_blank"
+              href={`https://multiembed.mov/?video_id=${episode.show_id}&tmdb=1`}
+            >
+              Link 4{" "}
+            </a>
+            <a
+              target="_blank"
+              href={`https://embed.su/embed/tv/${episode.show_id}`}
+            >
+              Link 5
+            </a>
+          </span>
+        </div>
+      ))}
+    </>
+  );
+}
+
+function TVEpisodes({ tvId, seasonNumber }) {
+  const messagePromise = fetch(
+    `https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}?language=en-US`,
+    options
+  ).then((res) => res.json());
+
+  return (
+    <Suspense fallback={<div>Loading episodes...</div>}>
+      <TVEpisodesData messagePromise={messagePromise} />
+    </Suspense>
+  );
+}
+
 function TvData({ messagePromise }) {
   const data = use(messagePromise);
-  return <pre>{JSON.stringify(data, null, 2)}</pre>;
+  return (
+    <>
+      {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
+      {data.seasons.map((season) => (
+        <div key={season.id}>
+          <h3>Season {season.season_number}</h3>
+          <p>Episodes: {season.episode_count}</p>
+          <p>Overview: {season.overview}</p>
+          <p>Air Date: {season.air_date}</p>
+          <img
+            src={`https://image.tmdb.org/t/p/w200/${season.poster_path}`}
+            alt={season.name}
+          />
+          <TVEpisodes tvId={data.id} seasonNumber={season.season_number} />
+        </div>
+      ))}
+    </>
+  );
 }
 
 function TvDataWrapper({ id }) {
