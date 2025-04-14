@@ -1,15 +1,33 @@
-import { use, Suspense, useState, useRef } from 'react';
+import { use, Suspense, useState, useRef } from "react";
 
 const options = {
-  method: 'GET',
+  method: "GET",
   headers: {
-    accept: 'application/json',
-    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxZmYwZGQ0MTc3NmQ3MzFlN2QxZGIwY2M5ZTgxMmE5OSIsIm5iZiI6MTczMTk2NDI0MC40NzMsInN1YiI6IjY3M2JhZDUwMmYxY2EyYmFmMzQ3OTU3YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.n5SXXISpHtyF5AU0PloIxY1TbK2Eua71do4X8lhOsj4',
+    accept: "application/json",
+    Authorization:
+      "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxZmYwZGQ0MTc3NmQ3MzFlN2QxZGIwY2M5ZTgxMmE5OSIsIm5iZiI6MTczMTk2NDI0MC40NzMsInN1YiI6IjY3M2JhZDUwMmYxY2EyYmFmMzQ3OTU3YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.n5SXXISpHtyF5AU0PloIxY1TbK2Eua71do4X8lhOsj4",
   },
 };
 
+function TvData({ messagePromise }) {
+  const data = use(messagePromise);
+  return <pre>{JSON.stringify(data, null, 2)}</pre>;
+}
 
-function MovieList({movieDataPromise}) {
+function TvDataWrapper({ id }) {
+  const messagePromise = fetch(
+    `https://api.themoviedb.org/3/tv/${id}?language=en-US`,
+    options
+  ).then((res) => res.json());
+
+  return (
+    <Suspense fallback={<div>Loading tv data...</div>}>
+      <TvData messagePromise={messagePromise} />
+    </Suspense>
+  );
+}
+
+function MovieList({ movieDataPromise }) {
   const data = use(movieDataPromise);
   return (
     <table border={1} cellSpacing={0} cellPadding={2} width={"100%"}>
@@ -17,35 +35,77 @@ function MovieList({movieDataPromise}) {
         <tr>
           <td colSpan={3}>Total: {data.total_results}</td>
         </tr>
-       <tr>
-        <th colSpan={2}>Movie Title</th>
-       <th>Links to watch</th>
-       </tr>
+        <tr>
+          <th colSpan={2}>Movie/TV Title</th>
+          <th>Links to watch</th>
+        </tr>
       </thead>
       <tbody>
-      {data.results.map((movie) => (<tr key={movie.id}>
-        <td><img src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`} alt={movie.title}/></td>
-        <td>
-        <h2>{movie.title}</h2>
-        <br />
-        {movie.adult ?  <>(A) <br /></>  : null}
-        Description: {movie.overview}
-        <br />
-        Release Date: <time>{movie.release_date}</time>
-        <br />
-        <em>IMDB Rating: {movie.vote_average}</em>
-        </td>
-        
-        <td>
-         <span style={{display: "flex", gap: 10, whiteSpace: "nowrap"}}>
-          <a target='_blank' href={`https://vidsrc.cc/v2/embed/movie/${movie.id}`}>Link 1</a>
-          <a target='_blank' href={`https://vidsrc.rip/embed/movie/${movie.id}`}>Link 2 </a> 
-          <a target='_blank' href={`https://vidsrc.xyz/embed/movie?tmdb=${movie.id}`}>Link 3 </a>
-          <a target='_blank' href={`https://multiembed.mov/?video_id=${movie.id}&tmdb=1`}>Link 4 </a>
-          <a target='_blank' href={`https://embed.su/embed/movie/${movie.id}`}>Link 5</a>
-          </span>
-        </td>
-      </tr>))}
+        {data.results.map((movie) => (
+          <tr key={movie.id}>
+            <td>
+              <img
+                src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
+                alt={movie.title}
+              />
+            </td>
+            <td>
+              <h2>{movie.title}</h2>
+              <br />
+              {movie.adult ? (
+                <>
+                  (A) <br />
+                </>
+              ) : null}
+              Description: {movie.overview}
+              <br />
+              Release Date: <time>{movie.release_date}</time>
+              <br />
+              <em>IMDB Rating: {movie.vote_average}</em>
+            </td>
+
+            <td>
+              {movie.media_type === "tv" ? (
+                <TvDataWrapper id={movie.id} />
+              ) : (
+                <span
+                  style={{ display: "flex", gap: 10, whiteSpace: "nowrap" }}
+                >
+                  <a
+                    target="_blank"
+                    href={`https://vidsrc.cc/v2/embed/movie/${movie.id}`}
+                  >
+                    Link 1
+                  </a>
+                  <a
+                    target="_blank"
+                    href={`https://vidsrc.rip/embed/movie/${movie.id}`}
+                  >
+                    Link 2{" "}
+                  </a>
+                  <a
+                    target="_blank"
+                    href={`https://vidsrc.xyz/embed/movie?tmdb=${movie.id}`}
+                  >
+                    Link 3{" "}
+                  </a>
+                  <a
+                    target="_blank"
+                    href={`https://multiembed.mov/?video_id=${movie.id}&tmdb=1`}
+                  >
+                    Link 4{" "}
+                  </a>
+                  <a
+                    target="_blank"
+                    href={`https://embed.su/embed/movie/${movie.id}`}
+                  >
+                    Link 5
+                  </a>
+                </span>
+              )}
+            </td>
+          </tr>
+        ))}
       </tbody>
     </table>
   );
@@ -53,40 +113,52 @@ function MovieList({movieDataPromise}) {
 
 function App() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [keyWord, setKeyWord] = useState('');
+  const [keyWord, setKeyWord] = useState("");
   const searchInputRef = useRef(null);
   const handleNextPage = () => setCurrentPage((prev) => prev + 1);
-  const handlePreviousPage = () => setCurrentPage((prev) =>Math.max(prev - 1, 1));
+  const handlePreviousPage = () =>
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
 
   const movieDataPromise = (page) => {
-   if (keyWord !== '') {
-      return fetch(`https://api.themoviedb.org/3/search/movie?include_adult=true&include_video=true&language=en-US&page=${page}&query=${keyWord}&sort_by=title.asc`, options).then((res) => res.json())
-   }
+    if (keyWord !== "") {
+      return fetch(
+        `https://api.themoviedb.org/3/search/multi?include_adult=false&include_video=true&language=en-US&page=${page}&query=${keyWord}&sort_by=title.asc`,
+        options
+      ).then((res) => res.json());
+    }
 
-    return fetch(`https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=true&language=en-US&page=${page}&sort_by=popularity.desc`, options).then((res) => res.json())
+    return fetch(
+      `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=true&language=en-US&page=${page}&sort_by=popularity.desc`,
+      options
+    ).then((res) => res.json());
   };
 
   return (
     <>
       <main>
-       <form onSubmit={
-       (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        setKeyWord(searchInputRef.current.value);
-        setCurrentPage(1);
-       }
-       }>
-       <input ref={searchInputRef} type='search' placeholder='Search for movies' /> <button>Search</button>
-       </form>
+        <form
+          onSubmit={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            setKeyWord(searchInputRef.current.value);
+            setCurrentPage(1);
+          }}
+        >
+          <input
+            ref={searchInputRef}
+            type="search"
+            placeholder="Search for movies"
+          />{" "}
+          <button>Search</button>
+        </form>
         <Suspense fallback={<div>Loading movies...</div>}>
           <MovieList movieDataPromise={movieDataPromise(currentPage)} />
         </Suspense>
-          <button onClick={handlePreviousPage} disabled={currentPage === 1}>
-            Previous
-          </button>
-            Page {currentPage}
-          <button onClick={handleNextPage}>Next</button>
+        <button onClick={handlePreviousPage} disabled={currentPage === 1}>
+          Previous
+        </button>
+        Page {currentPage}
+        <button onClick={handleNextPage}>Next</button>
       </main>
     </>
   );
