@@ -1,197 +1,7 @@
-import { use, Suspense, useState, useRef } from "react";
-
-const options = {
-  method: "GET",
-  headers: {
-    accept: "application/json",
-    Authorization:
-      "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxZmYwZGQ0MTc3NmQ3MzFlN2QxZGIwY2M5ZTgxMmE5OSIsIm5iZiI6MTczMTk2NDI0MC40NzMsInN1YiI6IjY3M2JhZDUwMmYxY2EyYmFmMzQ3OTU3YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.n5SXXISpHtyF5AU0PloIxY1TbK2Eua71do4X8lhOsj4",
-  },
-};
-
-function TVEpisodesData({ messagePromise }) {
-  const data = use(messagePromise);
-  return (
-    <>
-      {data.episodes.map((episode) => (
-        <div key={episode.id}>
-          <h3>Episode {episode.episode_number}</h3>
-          <p>Title: {episode.name}</p>
-          <p>Overview: {episode.overview}</p>
-          <p>Air Date: {episode.air_date}</p>
-          <img
-            src={`https://image.tmdb.org/t/p/w200/${episode.still_path}`}
-            alt={episode.name}
-          />
-          <span style={{ display: "flex", gap: 10, whiteSpace: "nowrap" }}>
-            <a
-              target="_blank"
-              href={`https://vidsrc.cc/v2/embed/tv/${episode.show_id}/${episode.season_number}/${episode.episode_number}`}
-            >
-              Link 1
-            </a>
-            <a
-              target="_blank"
-              href={`https://vidsrc.rip/embed/tv/${episode.show_id}/${episode.season_number}/${episode.episode_number}`}
-            >
-              Link 2{" "}
-            </a>
-            <a
-              target="_blank"
-              href={`https://vidsrc.xyz/embed/tv?tmdb=${episode.show_id}/${episode.season_number}/${episode.episode_number}`}
-            >
-              Link 3{" "}
-            </a>
-            <a
-              target="_blank"
-              href={`https://multiembed.mov/?video_id=${episode.show_id}&tmdb=1`}
-            >
-              Link 4{" "}
-            </a>
-            <a
-              target="_blank"
-              href={`https://embed.su/embed/tv/${episode.show_id}`}
-            >
-              Link 5
-            </a>
-          </span>
-        </div>
-      ))}
-    </>
-  );
-}
-
-function TVEpisodes({ tvId, seasonNumber }) {
-  const messagePromise = fetch(
-    `https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}?language=en-US`,
-    options
-  ).then((res) => res.json());
-
-  return (
-    <Suspense fallback={<div>Loading episodes...</div>}>
-      <TVEpisodesData messagePromise={messagePromise} />
-    </Suspense>
-  );
-}
-
-function TvData({ messagePromise }) {
-  const data = use(messagePromise);
-  return (
-    <>
-      {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
-      {data.seasons.map((season) => (
-        <div key={season.id}>
-          <h3>Season {season.season_number}</h3>
-          <p>Episodes: {season.episode_count}</p>
-          <p>Overview: {season.overview}</p>
-          <p>Air Date: {season.air_date}</p>
-          <img
-            src={`https://image.tmdb.org/t/p/w200/${season.poster_path}`}
-            alt={season.name}
-          />
-          <TVEpisodes tvId={data.id} seasonNumber={season.season_number} />
-        </div>
-      ))}
-    </>
-  );
-}
-
-function TvDataWrapper({ id }) {
-  const messagePromise = fetch(
-    `https://api.themoviedb.org/3/tv/${id}?language=en-US`,
-    options
-  ).then((res) => res.json());
-
-  return (
-    <Suspense fallback={<div>Loading tv data...</div>}>
-      <TvData messagePromise={messagePromise} />
-    </Suspense>
-  );
-}
-
-function MovieList({ movieDataPromise }) {
-  const data = use(movieDataPromise);
-  return (
-    <table border={1} cellSpacing={0} cellPadding={2} width={"100%"}>
-      <thead>
-        <tr>
-          <td colSpan={3}>Total: {data.total_results}</td>
-        </tr>
-        <tr>
-          <th colSpan={2}>Movie/TV Title</th>
-          <th>Links to watch</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.results.map((movie) => (
-          <tr key={movie.id}>
-            <td>
-              <img
-                src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
-                alt={movie.title}
-              />
-            </td>
-            <td>
-              <h2>{movie.title}</h2>
-              <br />
-              {movie.adult ? (
-                <>
-                  (A) <br />
-                </>
-              ) : null}
-              Description: {movie.overview}
-              <br />
-              Release Date: <time>{movie.release_date}</time>
-              <br />
-              <em>IMDB Rating: {movie.vote_average}</em>
-            </td>
-
-            <td>
-              {movie.media_type === "tv" ? (
-                <TvDataWrapper id={movie.id} />
-              ) : (
-                <span
-                  style={{ display: "flex", gap: 10, whiteSpace: "nowrap" }}
-                >
-                  <a
-                    target="_blank"
-                    href={`https://vidsrc.cc/v2/embed/movie/${movie.id}`}
-                  >
-                    Link 1
-                  </a>
-                  <a
-                    target="_blank"
-                    href={`https://vidsrc.rip/embed/movie/${movie.id}`}
-                  >
-                    Link 2{" "}
-                  </a>
-                  <a
-                    target="_blank"
-                    href={`https://vidsrc.xyz/embed/movie?tmdb=${movie.id}`}
-                  >
-                    Link 3{" "}
-                  </a>
-                  <a
-                    target="_blank"
-                    href={`https://multiembed.mov/?video_id=${movie.id}&tmdb=1`}
-                  >
-                    Link 4{" "}
-                  </a>
-                  <a
-                    target="_blank"
-                    href={`https://embed.su/embed/movie/${movie.id}`}
-                  >
-                    Link 5
-                  </a>
-                </span>
-              )}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
+import { Suspense, useState, useRef } from "react";
+import ErrorBoundary from "./ErrorBoundary";
+import MovieList from "./Movie/MovieList";
+import { apiHeaderOptions } from "./config";
 
 function App() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -205,13 +15,13 @@ function App() {
     if (keyWord !== "") {
       return fetch(
         `https://api.themoviedb.org/3/search/multi?include_adult=false&include_video=true&language=en-US&page=${page}&query=${keyWord}&sort_by=title.asc`,
-        options
+        apiHeaderOptions
       ).then((res) => res.json());
     }
 
     return fetch(
       `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=true&language=en-US&page=${page}&sort_by=popularity.desc`,
-      options
+      apiHeaderOptions
     ).then((res) => res.json());
   };
 
