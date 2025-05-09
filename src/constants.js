@@ -5,3 +5,6 @@ export const BASE_WATCH_URLS = {
   MULTIEMBED: "https://multiembed.mov",
   EMBED_SU: "https://embed.su/embed/",
 };
+export const API_TOKEN = import.meta.env.VITE_API_TOKEN;
+export const API_SEARCH_URL =
+  "https://api.themoviedb.org/3/search/multi?include_adult=false&include_video=true&language=en-US&page=";
