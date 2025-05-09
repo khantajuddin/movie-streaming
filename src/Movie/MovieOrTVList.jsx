@@ -1,7 +1,8 @@
 import { use } from "react";
 import TvSeasonsWrapper from "../TV/TvSeasons";
+import WatchLinks from "./WatchLinks";
 
-export default function MovieList({ movieDataPromise }) {
+export default function MovieOrTVList({ movieDataPromise }) {
   const data = use(movieDataPromise);
   return (
     <table border={1} cellSpacing={0} cellPadding={2} width={"100%"}>
@@ -14,6 +15,7 @@ export default function MovieList({ movieDataPromise }) {
           <th>Links to watch</th>
         </tr>
       </thead>
+
       <tbody>
         {data.results.map((movie) => (
           <tr key={movie.id}>
@@ -42,40 +44,7 @@ export default function MovieList({ movieDataPromise }) {
               {movie.media_type === "tv" ? (
                 <TvSeasonsWrapper id={movie.id} />
               ) : (
-                <span
-                  style={{ display: "flex", gap: 10, whiteSpace: "nowrap" }}
-                >
-                  <a
-                    target="_blank"
-                    href={`https://vidsrc.cc/v2/embed/movie/${movie.id}`}
-                  >
-                    Link 1
-                  </a>
-                  <a
-                    target="_blank"
-                    href={`https://vidsrc.rip/embed/movie/${movie.id}`}
-                  >
-                    Link 2{" "}
-                  </a>
-                  <a
-                    target="_blank"
-                    href={`https://vidsrc.xyz/embed/movie?tmdb=${movie.id}`}
-                  >
-                    Link 3{" "}
-                  </a>
-                  <a
-                    target="_blank"
-                    href={`https://multiembed.mov/?video_id=${movie.id}&tmdb=1`}
-                  >
-                    Link 4{" "}
-                  </a>
-                  <a
-                    target="_blank"
-                    href={`https://embed.su/embed/movie/${movie.id}`}
-                  >
-                    Link 5
-                  </a>
-                </span>
+                <WatchLinks type={"movie"} id={movie.id} />
               )}
             </td>
           </tr>

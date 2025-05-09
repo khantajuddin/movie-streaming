@@ -1,5 +1,6 @@
 import { Suspense, use, useState } from "react";
 import { apiHeaderOptions } from "../config";
+import WatchLinks from "../Movie/WatchLinks";
 function TvEpisodes({ messagePromise }) {
   const data = use(messagePromise);
   return (
@@ -14,39 +15,13 @@ function TvEpisodes({ messagePromise }) {
             src={`https://image.tmdb.org/t/p/w200/${episode.still_path}`}
             alt={episode.name}
           />
-          <span style={{ display: "flex", gap: 10, whiteSpace: "nowrap" }}>
-            <a
-              target="_blank"
-              href={`https://vidsrc.cc/v2/embed/tv/${episode.show_id}/${episode.season_number}/${episode.episode_number}`}
-            >
-              Link 1
-            </a>
 
-            <a
-              target="_blank"
-              href={`https://vidsrc.rip/embed/tv/${episode.show_id}/${episode.season_number}/${episode.episode_number}`}
-            >
-              Link 2{" "}
-            </a>
-            <a
-              target="_blank"
-              href={`https://vidsrc.xyz/embed/tv?tmdb=${episode.show_id}&season=${episode.season_number}&episode=${episode.episode_number}`}
-            >
-              Link 3{" "}
-            </a>
-            <a
-              target="_blank"
-              href={`https://multiembed.mov/?video_id=${episode.show_id}&tmdb=1&s${episode.season_number}&e=${episode.episode_number}`}
-            >
-              Link 4{" "}
-            </a>
-            <a
-              target="_blank"
-              href={`https://embed.su/embed/tv/${episode.show_id}/${episode.season_number}/${episode.episode_number}`}
-            >
-              Link 5
-            </a>
-          </span>
+          <WatchLinks
+            id={data.id}
+            type={"tv"}
+            seasonNumber={data.season_number}
+            episodeNumber={episode.episode_number}
+          />
         </div>
       ))}
     </>
