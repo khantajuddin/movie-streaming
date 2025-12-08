@@ -1,4 +1,3 @@
-import React from "react";
 import { BASE_WATCH_URLS } from "../constants";
 
 const WatchLinks = ({ id, type, seasonNumber = "", episodeNumber = "" }) => {
@@ -15,8 +14,8 @@ const WatchLinks = ({ id, type, seasonNumber = "", episodeNumber = "" }) => {
     },
     {
       name: "Link 3",
-      tv: `${BASE_WATCH_URLS.VIDSRC_XYZ}/tv?tmdb=${id}&season=${seasonNumber}&episode=${episodeNumber}`,
-      movie: `${BASE_WATCH_URLS.VIDSRC_XYZ}/movie?tmdb=${id}`,
+      tv: `${BASE_WATCH_URLS.VIDSRC_XYZ}/tv/${id}/${seasonNumber}/${episodeNumber}`,
+      movie: `${BASE_WATCH_URLS.VIDSRC_XYZ}/movie/${id}`,
     },
     {
       name: "Link 4",
@@ -27,6 +26,11 @@ const WatchLinks = ({ id, type, seasonNumber = "", episodeNumber = "" }) => {
       name: "Link 5",
       tv: `${BASE_WATCH_URLS.EMBED_SU}/${id}/${seasonNumber}/${episodeNumber}`,
       movie: `${BASE_WATCH_URLS.EMBED_SU}/${id}`,
+    },
+    {
+      name: "link 6",
+      movie: `https://moviesapi.to/movie/${id}`,
+      tv: `https://moviesapi.club/tv/${id}-${seasonNumber}-${seasonNumber}`,
     },
   ];
 

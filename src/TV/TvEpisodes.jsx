@@ -7,6 +7,7 @@ function TvEpisodes({ messagePromise }) {
     <>
       {data.episodes.map((episode) => (
         <div key={episode.id}>
+          {/* <pre>{JSON.stringify(episode, null, 2)}</pre> */}
           <h3>Episode {episode.episode_number}</h3>
           <p>Title: {episode.name}</p>
           <p>Overview: {episode.overview}</p>
@@ -17,7 +18,7 @@ function TvEpisodes({ messagePromise }) {
           />
 
           <WatchLinks
-            id={data.id}
+            id={episode.show_id}
             type={"tv"}
             seasonNumber={data.season_number}
             episodeNumber={episode.episode_number}
@@ -40,9 +41,11 @@ export default function TvEpisodesWrapper({ tvId, seasonNumber }) {
     <>
       <button onClick={() => setShowEpisodes(true)}>Show Episodes</button>
       {showEpisodes && (
-        <Suspense fallback={<div>Loading episodes...</div>}>
-          <TvEpisodes messagePromise={messagePromise} />
-        </Suspense>
+        <div>
+          <Suspense fallback={<div>Loading episodes...</div>}>
+            <TvEpisodes messagePromise={messagePromise} />
+          </Suspense>
+        </div>
       )}
     </>
   );

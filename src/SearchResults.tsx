@@ -6,7 +6,7 @@ import { SearchDataContext } from "./App";
 
 const SearchResults = () => {
   const { currentPage, keyWord } = use(SearchDataContext);
-  const dataPromise = (page) => {
+  const dataPromise = (page: string) => {
     if (keyWord !== "") {
       return fetch(
         `${API_SEARCH_URL}${page}&query=${keyWord}&sort_by=title.asc`,
